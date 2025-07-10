@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
     uiElements.startTimerBtn.addEventListener('click', startGameTimer);
     uiElements.changeCardBtn.addEventListener('click', changeCard);
     uiElements.rollDiceBtn.addEventListener('click', rollDice);
+    
+    // --- Challenge Dice Toggle ---
+    if (uiElements.challengeDiceToggle) {
+        uiElements.challengeDiceToggle.addEventListener('change', toggleChallengeDice);
+    }
 
     // --- Modal Controls (remain the same) ---
     uiElements.editDataBtn.addEventListener('click', () => {

@@ -57,8 +57,20 @@
 
         <div class="dice-area">
             <div id="standard-dice" class="dice">?</div>
-            <div id="challenge-dice" class="dice">?</div>
+            <div class="challenge-dice-container">
+                <div id="challenge-dice" class="dice">?</div>
+                <div class="challenge-toggle">
+                    <input type="checkbox" id="challenge-dice-toggle" checked>
+                    <label for="challenge-dice-toggle">Challenge Dice</label>
+                </div>
+            </div>
             <button id="roll-dice-btn" class="btn"></button>
+        </div>
+
+        <!-- Color Selection Display -->
+        <div id="color-selection" class="color-selection" style="display: none;">
+            <h4>Selected Color:</h4>
+            <div id="selected-color-indicator" class="selected-color-indicator"></div>
         </div>
 
         <!-- NEW: Challenge Description Area -->

@@ -5,14 +5,16 @@ const uiElements = {
     cardFlipper: document.getElementById('card-flipper'),
     cardFrontWords: document.querySelectorAll('.card-front .card-word-item .word-text'),
     cardBackWords: document.querySelectorAll('.card-back .card-word-item .word-text'),
-    cardFrontItems: document.querySelectorAll('.card-front .card-word-item'), // To set color class if needed
-    cardBackItems: document.querySelectorAll('.card-back .card-word-item'),   // To set color class if needed
+    cardFrontItems: document.querySelectorAll('.card-front .card-word-item'),
+    cardBackItems: document.querySelectorAll('.card-back .card-word-item'),
     flipCorners: document.querySelectorAll('.flip-corner'),
     cardPlaceholder: document.getElementById('card-placeholder'),
     gameContainer: document.querySelector('.game-container'),
     timerDisplay: document.getElementById('timer-display'),
     standardDice: document.getElementById('standard-dice'),
     challengeDice: document.getElementById('challenge-dice'),
+    challengeDiceContainer: document.querySelector('.challenge-dice-container'),
+    challengeDiceToggle: document.getElementById('challenge-dice-toggle'),
     rollDiceBtn: document.getElementById('roll-dice-btn'),
     startTimerBtn: document.getElementById('start-timer-btn'),
     changeCardBtn: document.getElementById('change-card-btn'),
@@ -28,64 +30,56 @@ const uiElements = {
     gameTitle: document.getElementById('game-title'),
     cardFrontTitle: document.getElementById('card-front-title'),
     cardBackTitle: document.getElementById('card-back-title'),
+    colorSelection: document.getElementById('color-selection'),
+    selectedColorIndicator: document.getElementById('selected-color-indicator'),
 };
 
 function updateCardFaces(cardWordObjects) {
-    // Get the current language setting
-    const currentLang = gameData.settings?.currentLanguage || 'ar'; // Default to 'ar'
+    const currentLang = gameData.settings?.currentLanguage || 'ar';
 
     if (cardWordObjects && cardWordObjects.front && cardWordObjects.back) {
         console.log(`Updating card faces for language: ${currentLang}`);
 
-        // Update Front Face based on current language
+        // Update Front Face
         cardWordObjects.front.forEach((wordObj, index) => {
             if (uiElements.cardFrontWords[index]) {
-                // Extract text for the current language, fallback to 'en' or '???'
                 const wordText = wordObj?.text?.[currentLang] || wordObj?.text?.['en'] || '???';
                 uiElements.cardFrontWords[index].textContent = wordText;
 
-                // Ensure data-color attribute is set (based on the object's colorType)
                 if(uiElements.cardFrontItems[index] && wordObj?.colorType) {
                     uiElements.cardFrontItems[index].dataset.color = wordObj.colorType;
                 }
             }
         });
 
-        // Update Back Face based on current language
+        // Update Back Face
         cardWordObjects.back.forEach((wordObj, index) => {
             if (uiElements.cardBackWords[index]) {
-                // Extract text for the current language, fallback to 'en' or '???'
                 const wordText = wordObj?.text?.[currentLang] || wordObj?.text?.['en'] || '???';
                 uiElements.cardBackWords[index].textContent = wordText;
 
-                // Ensure data-color attribute is set
                 if(uiElements.cardBackItems[index] && wordObj?.colorType) {
                     uiElements.cardBackItems[index].dataset.color = wordObj.colorType;
                 }
             }
         });
 
-        uiElements.cardFlipper.style.display = 'block'; // Show flipper
-        uiElements.cardPlaceholder.style.display = 'none'; // Hide placeholder
+        uiElements.cardFlipper.style.display = 'block';
+        uiElements.cardPlaceholder.style.display = 'none';
 
     } else {
-        // No card data, show placeholder
         console.log("No card data provided, showing placeholder.");
         uiElements.cardFlipper.style.display = 'none';
         uiElements.cardPlaceholder.textContent = getUIText('cardPlaceholder');
         uiElements.cardPlaceholder.style.display = 'block';
     }
-    // Don't reset flip here - keep the current flip state when just translating
-    // resetCardFlip();
 }
 
-// --- NEW Function to Flip Card ---
 function flipCard() {
     uiElements.cardFlipper.classList.toggle('is-flipped');
     console.log("Card flipped. Is flipped:", uiElements.cardFlipper.classList.contains('is-flipped'));
 }
 
-// --- NEW Function to Reset Flip ---
 function resetCardFlip() {
     uiElements.cardFlipper.classList.remove('is-flipped');
 }
@@ -98,64 +92,102 @@ function formatTime(totalSeconds) {
 
 function updateTimerDisplay(seconds) {
     uiElements.timerDisplay.textContent = formatTime(seconds);
-    uiElements.timerDisplay.classList.remove('timer-alert'); // Remove alert class if present
+    uiElements.timerDisplay.classList.remove('timer-alert');
 }
 
-function updateDiceDisplay(standardResult, challengeSymbol) { // Changed second param
+function updateDiceDisplay(standardResult, challengeSymbol) {
     [uiElements.standardDice, uiElements.challengeDice].forEach(dice => {
-        dice.classList.add('dice-rolling');
-        dice.onanimationend = () => {
-            dice.classList.remove('dice-rolling');
-            dice.onanimationend = null;
-        };
+        if (dice) {
+            dice.classList.add('dice-rolling');
+            dice.onanimationend = () => {
+                dice.classList.remove('dice-rolling');
+                dice.onanimationend = null;
+            };
+        }
     });
 
     setTimeout(() => {
         uiElements.standardDice.textContent = standardResult ?? '?';
-        uiElements.challengeDice.textContent = challengeSymbol ?? '?'; // Display the symbol
+        if (uiElements.challengeDice) {
+            uiElements.challengeDice.textContent = challengeSymbol ?? '?';
+        }
     }, 100);
 }
 
 function updateChallengeDescription(text) {
     if (uiElements.challengeDescription) {
-        uiElements.challengeDescription.textContent = text || ''; // Set text or clear
+        uiElements.challengeDescription.textContent = text || '';
+    }
+}
+
+function updateColorSelection(selectedColor) {
+    if (!uiElements.colorSelection || !uiElements.selectedColorIndicator) {
+        return;
+    }
+
+    if (selectedColor) {
+        // Show the color selection area
+        uiElements.colorSelection.style.display = 'block';
+        
+        // Update the indicator
+        const colorNames = {
+            yellow: { ar: 'أصفر', en: 'Yellow' },
+            blue: { ar: 'أزرق', en: 'Blue' },
+            orange: { ar: 'برتقالي', en: 'Orange' },
+            red: { ar: 'أحمر', en: 'Red' },
+            green: { ar: 'أخضر', en: 'Green' }
+        };
+
+        const lang = gameData.settings?.currentLanguage || 'ar';
+        const colorName = colorNames[selectedColor]?.[lang] || selectedColor;
+        
+        uiElements.selectedColorIndicator.textContent = colorName;
+        uiElements.selectedColorIndicator.className = `selected-color-indicator card-word-item`;
+        uiElements.selectedColorIndicator.dataset.color = selectedColor;
+    } else {
+        // Hide the color selection area
+        uiElements.colorSelection.style.display = 'none';
+    }
+}
+
+function updateChallengeDiceVisibility() {
+    if (uiElements.challengeDiceContainer) {
+        if (challengeDiceEnabled) {
+            uiElements.challengeDiceContainer.style.opacity = '1';
+            uiElements.challengeDiceContainer.style.pointerEvents = 'auto';
+        } else {
+            uiElements.challengeDiceContainer.style.opacity = '0.5';
+            uiElements.challengeDiceContainer.style.pointerEvents = 'none';
+        }
     }
 }
 
 function playSound(soundId) {
     const soundElement = document.getElementById(soundId);
     if (soundElement) {
-        soundElement.currentTime = 0; // Rewind to start
+        soundElement.currentTime = 0;
         soundElement.play().catch(error => console.warn(`Audio play failed for ${soundId}:`, error));
     } else {
         console.warn(`Sound element not found: ${soundId}`);
     }
 }
 
-/**
- * Stops the audio playback for the element with the given ID and rewinds it.
- * @param {string} soundId The ID of the <audio> element to stop.
- */
 function stopSound(soundId) {
     const soundElement = document.getElementById(soundId);
 
-    // Check if the element exists and has the 'pause' method (confirming it's likely audio/video)
     if (soundElement && typeof soundElement.pause === 'function') {
         try {
-            // Only try to pause if it's not already paused
             if (!soundElement.paused) {
                 soundElement.pause();
             }
-            soundElement.currentTime = 0; // Rewind to the beginning
+            soundElement.currentTime = 0;
             console.log(`Sound stopped and rewound: ${soundId}`);
         } catch (error) {
             console.error(`Error stopping/rewinding sound ${soundId}:`, error);
         }
-    } else {
-        // You might not always want a warning if you try to stop a sound that doesn't exist or isn't playing
-        // console.warn(`Attempted to stop non-existent or non-audio element: ${soundId}`);
     }
 }
+
 function toggleModal(show) {
     uiElements.editModal.style.display = show ? 'block' : 'none';
 }
@@ -167,7 +199,7 @@ function updateUILanguage() {
     document.documentElement.lang = lang;
     document.documentElement.dir = dir;
 
-    // Update button texts etc.
+    // Update button texts
     uiElements.startTimerBtn.textContent = getUIText('startGame');
     uiElements.changeCardBtn.textContent = getUIText('changeCard');
     uiElements.editDataBtn.textContent = getUIText('editData');
@@ -176,12 +208,25 @@ function updateUILanguage() {
     uiElements.gameTitle.textContent = getUIText('gameTitle');
     uiElements.cardFrontTitle.textContent = getUIText('cardFrontTitle');
     uiElements.cardBackTitle.textContent = getUIText('cardBackTitle');
-    // Update placeholder if no card is currently shown
+    
+    // Update color selection title
+    if (uiElements.colorSelection) {
+        const colorTitle = uiElements.colorSelection.querySelector('h4');
+        if (colorTitle) {
+            colorTitle.textContent = getUIText('selectedColor') || (lang === 'ar' ? 'اللون المحدد:' : 'Selected Color:');
+        }
+    }
+    
+    // Update challenge toggle label
+    const challengeToggleLabel = document.querySelector('.challenge-toggle label');
+    if (challengeToggleLabel) {
+        challengeToggleLabel.textContent = getUIText('challengeDice') || (lang === 'ar' ? 'تحدي النرد' : 'Challenge Dice');
+    }
+
     if (uiElements.cardPlaceholder.style.display !== 'none') {
          uiElements.cardPlaceholder.textContent = getUIText('cardPlaceholder');
     }
 
-     // Update language switcher selection
     if(uiElements.languageSwitcher) uiElements.languageSwitcher.value = lang;
 
     console.log(`UI language updated to ${lang} (${dir})`);
@@ -191,24 +236,23 @@ function showTimerEndAlert() {
     playSound('timer-end-sound');
     stopSound('timer-tick-sound');
     uiElements.timerDisplay.classList.add('timer-alert');
-    // Optionally show a brief message
-    // alert(getUIText('timesUp'));
 }
 
-// Initial setup for elements that need text from data
 function initializeUI() {
     updateUILanguage();
     updateTimerDisplay(60);
-    updateDiceDisplay('?', '?'); // Initial dice state
+    updateDiceDisplay('?', '?');
     updateCardFaces(null);
+    updateColorSelection(null);
+    updateChallengeDiceVisibility();
     uiElements.cardFlipper.style.height = uiElements.cardFlipper.style.minHeight || '0px';
-    updateChallengeDescription(''); // Clear challenge description initially
+    updateChallengeDescription('');
 }
 
-// --- Generate HTML for Language Inputs ---
+// Generate HTML for Language Inputs
 function generateLanguageInputs(baseId, values = {}) {
     let inputsHTML = '';
-    const languages = gameData.settings?.availableLanguages || ['ar', 'en']; // Fallback
+    const languages = gameData.settings?.availableLanguages || ['ar', 'en'];
     languages.forEach(lang => {
         const value = values[lang] || '';
         inputsHTML += `
@@ -219,12 +263,11 @@ function generateLanguageInputs(baseId, values = {}) {
     return `<div class="language-inputs">${inputsHTML}</div>`;
 }
 
-// --- Generate HTML for Color Select ---
+// Generate HTML for Color Select
 function generateColorSelect(baseId, selectedValue = '') {
     let optionsHTML = '<option value="">-- Select Color --</option>';
     for (const [key, value] of Object.entries(COLOR_TYPES)) {
         const selected = value === selectedValue ? 'selected' : '';
-        // Use key (e.g., YELLOW) for display, value (e.g., 'yellow') for the option value
         optionsHTML += `<option value="${value}" ${selected}>${key}</option>`;
     }
     return `
@@ -235,7 +278,7 @@ function generateColorSelect(baseId, selectedValue = '') {
      `;
 }
 
-// --- Populate Edit Modal ---
+// Populate Edit Modal
 function populateEditModal() {
     if (!gameData || !gameData.categories) {
         uiElements.modalFormContent.innerHTML = '<p>Error: Game data not loaded.</p>';
@@ -245,7 +288,7 @@ function populateEditModal() {
     const lang = gameData.settings.currentLanguage;
     let modalHTML = '';
 
-    // --- Add New Category Form ---
+    // Add New Category Form
     modalHTML += `
         <div class="modal-section add-category-section">
             <h4>Add New Category</h4>
@@ -258,7 +301,7 @@ function populateEditModal() {
         <hr>
     `;
 
-    // --- List Existing Categories ---
+    // List Existing Categories
     gameData.categories.forEach(category => {
         const categoryName = category.name[lang] || category.name['en'] || '???';
 
@@ -274,12 +317,11 @@ function populateEditModal() {
                     </div>
                 </div>
 
-                <!-- Placeholder for Edit Category Form -->
                 <div class="edit-category-form-container" style="display: none;"></div>
 
                 <ul class="word-list">`;
 
-        // --- List Words within Category ---
+        // List Words within Category
         if (category.words && category.words.length > 0) {
             category.words.forEach(word => {
                 const wordText = word.text[lang] || word.text['en'] || '???';
@@ -290,8 +332,7 @@ function populateEditModal() {
                             <button data-action="edit-word-start" data-word-id="${word.id}" data-category-id="${category.id}">Edit</button>
                             <button data-action="delete-word" data-word-id="${word.id}" data-category-id="${category.id}" class="danger-btn">Delete</button>
                         </div>
-                         <!-- Placeholder for Edit Word Form -->
-                        <div class="edit-word-form-container" style="display: none;"></div>
+                         <div class="edit-word-form-container" style="display: none;"></div>
                     </li>`;
             });
         } else {
@@ -299,7 +340,7 @@ function populateEditModal() {
         }
         modalHTML += `</ul>`;
 
-        // --- Add New Word Form (within Category) ---
+        // Add New Word Form
         modalHTML += `
                 <div class="add-word-section">
                     <details>
@@ -318,19 +359,14 @@ function populateEditModal() {
                     </details>
                 </div>`;
 
-        modalHTML += `</div> <hr>`; // End category-section
+        modalHTML += `</div> <hr>`;
     });
 
     uiElements.modalFormContent.innerHTML = modalHTML;
-
-    // Add some basic styling for the modal content if needed in style.css
-    // e.g., .modal-section, .category-header, .word-list, .word-item, etc.
 }
 
-
-// Add this helper if you need to show edit forms inline
 function showEditCategoryForm(categoryId) {
-    const category = findCategoryById(categoryId); // Use data.js helper
+    const category = findCategoryById(categoryId);
     const container = document.querySelector(`.category-section[data-category-id="${categoryId}"] .edit-category-form-container`);
     const header = document.querySelector(`.category-section[data-category-id="${categoryId}"] .category-header`);
 
@@ -347,7 +383,7 @@ function showEditCategoryForm(categoryId) {
     `;
     container.innerHTML = formHTML;
     container.style.display = 'block';
-    header.style.display = 'none'; // Hide header while editing
+    header.style.display = 'none';
 }
 
 function hideEditCategoryForm(categoryId) {
@@ -355,10 +391,10 @@ function hideEditCategoryForm(categoryId) {
     const header = document.querySelector(`.category-section[data-category-id="${categoryId}"] .category-header`);
     if (container) {
         container.style.display = 'none';
-        container.innerHTML = ''; // Clear form
+        container.innerHTML = '';
     }
     if(header) {
-        header.style.display = ''; // Show header again
+        header.style.display = '';
     }
 }
 
@@ -366,8 +402,8 @@ function showEditWordForm(categoryId, wordId) {
     const category = findCategoryById(categoryId);
     const word = findWordById(category, wordId);
     const container = document.querySelector(`.word-item[data-word-id="${wordId}"] .edit-word-form-container`);
-    const wordDisplay = document.querySelector(`.word-item[data-word-id="${wordId}"] > span`); // The text part
-    const wordActions = document.querySelector(`.word-item[data-word-id="${wordId}"] > .word-actions`); // The button part
+    const wordDisplay = document.querySelector(`.word-item[data-word-id="${wordId}"] > span`);
+    const wordActions = document.querySelector(`.word-item[data-word-id="${wordId}"] > .word-actions`);
 
     if (!word || !container || !wordDisplay || !wordActions) return;
 
@@ -387,8 +423,8 @@ function showEditWordForm(categoryId, wordId) {
     `;
     container.innerHTML = formHTML;
     container.style.display = 'block';
-    wordDisplay.style.display = 'none'; // Hide static text
-    wordActions.style.display = 'none'; // Hide action buttons
+    wordDisplay.style.display = 'none';
+    wordActions.style.display = 'none';
 }
 
 function hideEditWordForm(categoryId, wordId) {
