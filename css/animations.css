@@ -1,0 +1,62 @@
+/* --- Card Reveal Animations --- */
+
+/* Example: Fade In */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.reveal-fade {
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+/* Example: Flip In (Horizontal) */
+@keyframes flipInX {
+  from { transform: perspective(400px) rotateX(90deg); opacity: 0; }
+  to { transform: perspective(400px) rotateX(0deg); opacity: 1; }
+}
+.reveal-flip {
+  backface-visibility: hidden; /* Improves rendering during flip */
+  animation: flipInX 0.6s ease-in forwards;
+}
+
+/* Example: Zoom In */
+@keyframes zoomIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.reveal-zoom {
+    animation: zoomIn 0.4s ease-out forwards;
+}
+
+/* Example: Slide In From Top */
+@keyframes slideInTop {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.reveal-slide-top {
+    animation: slideInTop 0.5s ease-out forwards;
+}
+
+
+/* Add more @keyframes and corresponding .reveal-* classes as desired */
+
+
+/* --- Timer Alert Animation --- */
+@keyframes timerPulse {
+    0%, 100% { transform: scale(1); color: #dc3545; } /* End color red */
+    50% { transform: scale(1.1); }
+}
+
+.timer-alert {
+    animation: timerPulse 0.5s ease-in-out 3; /* Pulse 3 times */
+}
+
+/* --- Dice Roll Animation (Simple Spin) --- */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.dice-rolling {
+    animation: spin 0.3s linear 2; /* Spin twice quickly */
+}

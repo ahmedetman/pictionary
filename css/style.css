@@ -1,0 +1,555 @@
+/* Basic Reset & Body */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px; /* Base font size */
+}
+
+body {
+    font-family: 'Cairo', sans-serif; /* Arabic-friendly font */
+    background-color: #f4f4f4;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1rem;
+}
+
+/* Game Container */
+.game-container {
+    background-color: #fff;
+    padding: 1.5rem 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 500px; /* Max width for larger screens */
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem; /* Spacing between elements */
+}
+
+h1 {
+    color: #007bff; /* Pictionary blue */
+    margin-bottom: 0.5rem;
+}
+
+/* Card Display */
+.card {
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    padding: 1.5rem 1rem;
+    min-height: 150px; /* Ensure space even when empty */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative; /* For absolute positioning of indicator */
+}
+
+
+/* Card Container & Flipper */
+.card-container {
+    width: 100%;
+    /* Adjust height based on content, maybe min-height */
+    min-height: 40vh;
+    position: relative; /* Needed for placeholder positioning */
+}
+
+.card-flipper {
+    width: 100%;
+    height: 40vh; /* Fixed height for flip */
+    position: relative;
+    transform-style: preserve-3d;
+    perspective: 1000px; /* 3D space */
+    transition: transform 0.6s;
+    display: none; /* Hide initially until card is drawn */
+}
+
+.card-flipper.is-flipped {
+    transform: rotateY(180deg);
+}
+
+/* Card Faces (Front & Back) */
+.card-face {
+    position: absolute;
+    width: 100%;
+    backface-visibility: hidden; /* Hide the back side when facing away */
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    background-color: #f8f9fa; /* Light background for card */
+    padding: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card-face h3 {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+    font-weight: normal;
+}
+
+.card-back {
+    transform: rotateY(180deg); /* Position back face */
+    background-color: #e9ecef; /* Slightly different bg for back */
+}
+
+/* Word List Styling */
+.card-words-list {
+    width: 100%;
+    padding: 0 1rem;
+    text-align: start; /* Right align for RTL */
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem; /* Space between words */
+}
+
+html[dir="ltr"] .card-words-list {
+    text-align: left; /* Left align for LTR */
+}
+
+.card-word-item {
+    font-size: 1.1rem;
+    /* border-left: 5px solid transparent; */ /* REMOVE this */
+    /* padding-left: 10px; */             /* REMOVE this */
+    padding: 0.4rem 0.8rem; /* Add overall padding inside background */
+    border-radius: 4px;     /* Optional: makes it look nicer */
+    margin-bottom: 0.3rem;  /* Optional: adds space between items */
+    /* Ensure text color is set later by specific rules */
+}
+
+/* Modify Color Coding Classes */
+.card-word-item[data-color="yellow"] {
+    /* background-color: #ffc107; */ /* Original Yellow */
+    background-color: #ffe082; /* Lighter yellow for better contrast with dark text */
+    color: #343a40; /* Keep dark text for light yellow */
+}
+.card-word-item[data-color="blue"]   {
+    background-color: #007bff;
+    color: #fff; /* White text for contrast */
+}
+.card-word-item[data-color="orange"] {
+    background-color: #fd7e14;
+    color: #fff; /* White text for contrast */
+}
+.card-word-item[data-color="red"]    {
+    background-color: #dc3545;
+    color: #fff; /* White text for contrast */
+}
+.card-word-item[data-color="green"]  {
+    background-color: #28a745;
+    color: #fff; /* White text for contrast */
+}
+
+/* Style for the number remains the same, but might need color adjustment */
+.card-word-item span:first-child { /* The number */
+    display: inline-block;
+    width: 20px;
+    color: inherit; /* Inherit color from parent (now white or dark grey) */
+    opacity: 0.8;   /* Make number slightly less prominent */
+    margin-right: 5px; /* Space between number and word */
+}
+html[dir="ltr"] .card-word-item span:first-child {
+    margin-right: 0;
+    margin-left: 5px;
+}
+
+.card-word-item .word-text {
+    font-weight: bold;
+}
+
+
+/* Placeholder Text */
+#card-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #6c757d;
+    font-size: 1rem;
+    display: block; /* Show initially */
+    width: 100%; /* Take full width for centering */
+    text-align: center;
+}
+
+
+/* Flip Corners */
+.flip-corner {
+    position: absolute;
+    width: 40px; /* Clickable area size */
+    height: 40px;
+    /* background-color: rgba(0, 0, 255, 0.1); */ /* Optional: for debugging */
+    cursor: pointer;
+    z-index: 10; /* Ensure they are clickable */
+}
+
+.top-right::before {
+    content: '🔃'; /* The refresh/flip symbol Unicode character */
+    /* Positioning the symbol within the corner div */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the symbol */
+
+    /* Styling the symbol */
+    font-size: 1.1rem; /* Adjust size as desired */
+    color: #007bff;    /* Or choose another color, maybe theme blue */
+    opacity: 0.6;      /* Make it slightly transparent initially */
+    transition: opacity 0.2s ease-in-out;
+
+    /* Prevent the symbol itself from interfering with clicks on the corner div */
+    pointer-events: none;
+}
+
+.top-right:hover::before {
+    opacity: 1; /* Make fully visible on hover */
+}
+
+.flip-corner.top-left     { top: 0; left: 0; }
+.flip-corner.top-right    { top: 0; right: 0;}
+.flip-corner.bottom-left  { bottom: 0; left: 0; }
+.flip-corner.bottom-right { bottom: 0; right: 0; }
+
+html[dir="ltr"] .all-play-indicator {
+    left: auto;
+    right: 15px; /* Adjust for LTR */
+}
+
+
+/* Timer */
+.timer {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #28a745; /* Green for timer */
+}
+
+/* Dice Area */
+.dice-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.dice {
+    width: 50px;
+    height: 50px;
+    border: 2px solid #adb5bd;
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: bold;
+    background-color: #f8f9fa;
+}
+
+.challenge-text {
+    margin-top: -0.5rem; /* Pull it slightly closer to the dice */
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    color: #555;
+    min-height: 1.2em; /* Prevent layout shift when text appears/disappears */
+    font-style: italic;
+    font-weight: bold;
+}
+
+/* Buttons */
+.controls, .settings-area {
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+    flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+}
+
+.btn {
+    padding: 0.7rem 1.2rem;
+    font-size: 1rem;
+    font-family: inherit;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    background-color: #007bff;
+    color: white;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+}
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* Language Switcher */
+#language-switcher {
+    padding: 0.6rem;
+    font-family: inherit;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+/* Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto; /* 10% from the top and centered */
+    padding: 25px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+    max-width: 600px;
+    border-radius: 8px;
+    position: relative;
+    max-height: 80vh; /* Limit height and allow scrolling within */
+    overflow-y: auto;
+}
+
+/* Modal Content Styling */
+.modal-content h3,
+.modal-content h4 {
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.modal-section {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    background-color: #fdfdfd;
+}
+
+.category-header, .word-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+}
+
+.category-header h5 {
+    margin: 0;
+    font-size: 1.1em;
+}
+
+.category-actions button,
+.word-actions button {
+    margin-left: 5px;
+    padding: 3px 8px;
+    font-size: 0.8em;
+    cursor: pointer;
+}
+html[dir="ltr"] .category-actions button,
+html[dir="ltr"] .word-actions button {
+    margin-left: 0;
+    margin-right: 5px;
+}
+
+
+.word-list {
+    list-style: none;
+    padding-left: 15px;
+    margin-top: 1rem;
+}
+html[dir="ltr"] .word-list {
+    padding-left: 0;
+    padding-right: 15px;
+}
+
+
+.word-item {
+    padding: 5px 0;
+    border-bottom: 1px dashed #eee;
+}
+.word-item:last-child {
+    border-bottom: none;
+}
+
+.modal-section form {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px dashed #ddd;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+}
+.modal-section form label,
+.modal-section form input,
+.modal-section form select,
+.modal-section form button {
+    display: block;
+    margin-bottom: 0.7rem;
+    width: 95%; /* Adjust as needed */
+}
+.modal-section form label input[type="checkbox"] {
+    display: inline-block;
+    width: auto;
+    margin-right: 5px;
+}
+
+.language-inputs {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #eee;
+}
+.language-inputs label {
+    font-weight: bold;
+    font-size: 0.9em;
+}
+.language-inputs input {
+    margin-left: 5px; /* Indent language inputs */
+}
+html[dir="ltr"] .language-inputs input {
+    margin-left: 0;
+    margin-right: 5px;
+}
+
+
+.add-word-section details summary {
+    cursor: pointer;
+    font-weight: bold;
+    color: #0056b3;
+    margin-top: 1rem;
+}
+
+.danger-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
+.danger-btn:hover {
+    background-color: #c82333;
+}
+
+/* Edit form containers */
+.edit-category-form-container,
+.edit-word-form-container {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid #007bff;
+    background-color: #e7f3ff;
+    border-radius: 4px;
+}
+.edit-category-form-container h6,
+.edit-word-form-container h6 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #0056b3;
+}
+
+.close-btn {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    left: 15px; /* Adjusted for RTL */
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+html[dir="ltr"] .close-btn {
+    left: auto;
+    right: 15px;
+}
+
+
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
+}
+
+#modal-form-content {
+    margin-top: 1.5rem;
+    /* Styles for forms within the modal will go here */
+}
+
+.btn:disabled,
+.btn[disabled] { /* Handles both JS setting .disabled and HTML attribute */
+    background-color: #6c757d; /* Grey background */
+    border-color: #6c757d;
+    opacity: 0.65;
+    cursor: not-allowed; /* Indicate it's not clickable */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    html {
+        font-size: 14px; /* Smaller base font on mobile */
+    }
+
+    .game-container {
+        padding: 1rem 1.5rem;
+        gap: 1rem;
+    }
+
+    .card {
+        min-height: 120px;
+        padding: 1rem 0.8rem;
+    }
+
+    .card-word {
+        font-size: 1.5rem;
+    }
+
+    .timer {
+        font-size: 2rem;
+    }
+
+    .dice {
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+    }
+
+    .btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .modal-content {
+        width: 90%;
+        margin: 15% auto;
+    }
+
+    .card-container {
+        min-height: 45vh;
+    }
+    .card-flipper {
+        height: 45vh;
+    }
+    .card-word-item {
+        font-size: 1rem;
+    }
+    .card-face h3 {
+        font-size: 0.8rem;
+    }
+}
