@@ -994,8 +994,9 @@ const defaultCategories = [
 const defaultGameData = {
     categories: defaultCategories,
     settings: {
-        currentLanguage: 'ar',
-        availableLanguages: ['ar', 'en']
+        currentLanguage: 'en',
+        availableLanguages: ['ar', 'en'],
+        challengeDice: "💪💪"
     },
     uiStrings: {
         ar: {
@@ -1012,6 +1013,7 @@ const defaultGameData = {
             gameTitle: "لعبة التخمين",
             cardFrontTitle: "الوجه الأمامي",
             cardBackTitle: "الوجه الخلفي",
+            challengeDice: "💪💪"
         },
         en: {
             startGame: "Start Timer",
@@ -1027,6 +1029,7 @@ const defaultGameData = {
             gameTitle: "Pictionary",
             cardFrontTitle: "Front Face",
             cardBackTitle: "Back Face",
+            challengeDice: "💪💪"
         }
     }
 };

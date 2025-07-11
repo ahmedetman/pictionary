@@ -107,9 +107,6 @@ function drawNextCard() {
         console.log("Card data received, enabling dice button.");
         updateCardFaces(currentGameCardWordObjects);
         uiElements.rollDiceBtn.disabled = false;
-        
-        // Clear any previous color selection
-        updateColorSelection(null);
     } else {
         console.warn("Could not get card data. Dice button remains disabled.");
         updateCardFaces(null);
@@ -121,6 +118,7 @@ function changeCard() {
     console.log("Change card requested.");
     playSound('alert-sound');
     drawNextCard();
+    
 }
 
 function selectRandomColor() {
@@ -199,7 +197,6 @@ function rollDice() {
     // Update UI
     updateDiceDisplay(standardResult, challengeSymbol);
     updateChallengeDescription(challengeDescriptionText);
-    updateColorSelection(currentSelectedColor);
     
     // Apply color selection visual effects
     applyColorSelectionEffects(currentSelectedColor);

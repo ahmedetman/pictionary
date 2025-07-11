@@ -38,12 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedLang = event.target.value;
         if (setLanguage(selectedLang)) { // Update language setting in data.js
             updateUILanguage(); // Update buttons, static text
-
-            // Update placeholder text if visible (no card drawn yet)
-            if (uiElements.cardPlaceholder.style.display !== 'none') {
-                uiElements.cardPlaceholder.textContent = getUIText('cardPlaceholder');
-            }
-
             // --- Instead of drawing a new card, re-render the existing one ---
             if (currentGameCardWordObjects) { // Check if a card is currently displayed
                 console.log("Language switched, re-rendering current card faces.");
