@@ -153,11 +153,9 @@ function updateColorSelection(selectedColor) {
 function updateChallengeDiceVisibility() {
     if (uiElements.challengeDiceContainer) {
         if (challengeDiceEnabled) {
-            uiElements.challengeDiceContainer.style.opacity = '1';
-            uiElements.challengeDiceContainer.style.pointerEvents = 'auto';
+            uiElements.challengeDiceContainer.classList.remove('hidden');
         } else {
-            uiElements.challengeDiceContainer.style.opacity = '0.5';
-            uiElements.challengeDiceContainer.style.pointerEvents = 'none';
+            uiElements.challengeDiceContainer.classList.add('hidden');
         }
     }
 }

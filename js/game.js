@@ -3,7 +3,7 @@
 let timerInterval = null;
 let remainingSeconds = 60;
 let isTimerRunning = false;
-let challengeDiceEnabled = true; // New setting for challenge dice
+let challengeDiceEnabled = false; // Challenge dice hidden by default
 let currentSelectedColor = null; // Track the currently selected color
 
 const challengeDiceOptions = [
@@ -30,7 +30,7 @@ function initGame() {
     uiElements.rollDiceBtn.disabled = true;
     
     // Initialize challenge dice setting
-    challengeDiceEnabled = true;
+    challengeDiceEnabled = false;
     if (uiElements.challengeDiceToggle) {
         uiElements.challengeDiceToggle.checked = challengeDiceEnabled;
     }
