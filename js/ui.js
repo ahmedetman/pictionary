@@ -30,7 +30,6 @@ const uiElements = {
     gameTitle: document.getElementById('game-title'),
     cardFrontTitle: document.getElementById('card-front-title'),
     cardBackTitle: document.getElementById('card-back-title'),
-    colorSelection: document.getElementById('color-selection'),
     selectedColorIndicator: document.getElementById('selected-color-indicator'),
 };
 
@@ -65,13 +64,10 @@ function updateCardFaces(cardWordObjects) {
         });
 
         uiElements.cardFlipper.style.display = 'block';
-        uiElements.cardPlaceholder.style.display = 'none';
 
     } else {
         console.log("No card data provided, showing placeholder.");
         uiElements.cardFlipper.style.display = 'none';
-        uiElements.cardPlaceholder.textContent = getUIText('cardPlaceholder');
-        uiElements.cardPlaceholder.style.display = 'block';
     }
 }
 
@@ -121,14 +117,11 @@ function updateChallengeDescription(text) {
 }
 
 function updateColorSelection(selectedColor) {
-    if (!uiElements.colorSelection || !uiElements.selectedColorIndicator) {
+    if (!uiElements.selectedColorIndicator) {
         return;
     }
 
     if (selectedColor) {
-        // Show the color selection area
-        uiElements.colorSelection.style.display = 'block';
-        
         // Update the indicator
         const colorNames = {
             yellow: { ar: 'أصفر', en: 'Yellow' },
@@ -144,9 +137,6 @@ function updateColorSelection(selectedColor) {
         uiElements.selectedColorIndicator.textContent = colorName;
         uiElements.selectedColorIndicator.className = `selected-color-indicator card-word-item`;
         uiElements.selectedColorIndicator.dataset.color = selectedColor;
-    } else {
-        // Hide the color selection area
-        uiElements.colorSelection.style.display = 'none';
     }
 }
 
@@ -218,13 +208,8 @@ function updateUILanguage() {
     // Update challenge toggle label
     const challengeToggleLabel = document.querySelector('.challenge-toggle label');
     if (challengeToggleLabel) {
-        challengeToggleLabel.textContent = getUIText('challengeDice') || (lang === 'ar' ? 'تحدي النرد' : 'Challenge Dice');
+        challengeToggleLabel.textContent = getUIText('challengeDice');
     }
-
-    if (uiElements.cardPlaceholder.style.display !== 'none') {
-         uiElements.cardPlaceholder.textContent = getUIText('cardPlaceholder');
-    }
-
     if(uiElements.languageSwitcher) uiElements.languageSwitcher.value = lang;
 
     console.log(`UI language updated to ${lang} (${dir})`);
@@ -243,7 +228,6 @@ function initializeUI() {
     updateCardFaces(null);
     updateColorSelection(null);
     updateChallengeDiceVisibility();
-    uiElements.cardFlipper.style.height = uiElements.cardFlipper.style.minHeight || '0px';
     updateChallengeDescription('');
 }
 

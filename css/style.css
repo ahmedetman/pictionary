@@ -105,7 +105,7 @@ h1 {
 
 .card-flipper {
     width: 100%;
-    height: 350px;
+    height: 490px;
     position: relative;
     transform-style: preserve-3d;
     perspective: 1000px;
@@ -122,6 +122,8 @@ h1 {
     position: absolute;
     width: 100%;
     height: 100%;
+    top: 0; /* Ensure both faces start at the top */
+    left: 0; /* Ensure both faces start at the left */
     backface-visibility: hidden;
     border-radius: 15px;
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
@@ -133,39 +135,23 @@ h1 {
     flex-direction: column;
     align-items: center;
     border: 2px solid rgba(255, 255, 255, 0.8);
-    position: relative;
     overflow: hidden;
+    z-index: 1; /* Ensure stacking context */
 }
 
-.card-face::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
-    animation: shimmer 3s ease-in-out infinite;
-    pointer-events: none;
-}
-
-@keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-}
-
-.card-face h3 {
-    font-size: 1.1rem;
-    color: #495057;
-    margin-bottom: 1.5rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+.card-front {
+    transform: rotateY(0deg);
+    z-index: 2; /* Front face is above by default */
 }
 
 .card-back {
     transform: rotateY(180deg);
-    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    z-index: 1;
+}
+
+/* When flipped, the .card-flipper rotates, showing the back */
+.card-flipper.is-flipped {
+    transform: rotateY(180deg);
 }
 
 /* Word List Styling */
@@ -238,7 +224,6 @@ html[dir="ltr"] .card-words-list {
 
 .card-word-item span:first-child {
     display: inline-block;
-    width: 25px;
     color: inherit;
     opacity: 0.9;
     margin-right: 8px;
@@ -396,21 +381,6 @@ html[dir="ltr"] .card-word-item span:first-child {
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Color Selection Display */
-.color-selection {
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    margin: 1rem 0;
-}
-
-.color-selection h4 {
-    margin-bottom: 0.5rem;
-    color: #333;
-    font-weight: 600;
-}
 
 .selected-color-indicator {
     display: inline-block;
@@ -624,6 +594,7 @@ html[dir="ltr"] .card-word-item span:first-child {
 .word-list {
     list-style: none;
     padding: 0;
+    color: darkcyan;
     margin: 1rem 0;
 }
 
@@ -773,10 +744,6 @@ html[dir="rtl"] .close-btn {
         min-height: 300px;
     }
 
-    .card-flipper {
-        height: 300px;
-    }
-
     .timer {
         font-size: 2.5rem;
     }
@@ -814,6 +781,10 @@ html[dir="rtl"] .close-btn {
     .word-actions {
         width: 100%;
         justify-content: flex-end;
+    }
+
+    .card-flipper {
+        height: 370px;
     }
 }
 
