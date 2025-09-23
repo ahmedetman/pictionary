@@ -4,8 +4,8 @@
   "description": "A web-based Pictionary helper application",
   "main": "index.html",
   "scripts": {
-    "start": "python3 -m http.server 8000",
-    "dev": "python3 -m http.server 8000"
+    "start": "echo 'Open index.html in your browser to view the application'",
+    "dev": "echo 'Open index.html in your browser to view the application'"
   },
   "keywords": ["pictionary", "game", "helper", "web"],
   "author": "",
